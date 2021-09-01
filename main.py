@@ -7,6 +7,11 @@ def print_thresholds():
   for n in range(1, 7):
     print(f"{n}:", round(Stats.ev_dice[n] / Stats.farkle_chance[n]))
 
+def print_evs():
+  print("Expected point values of rolling x dice:")
+  for n in range(1, 7):
+    print(f"{n}:", round(Stats.ev_dice[n]))
+
 def interactive():
   while True:
     print("Enter points pending and number of dice available to reroll:")
@@ -26,6 +31,8 @@ def interactive():
 def main():
   Stats.initialize(score_dice)
   print_thresholds()
+  print()
+  print_evs()
 
 if __name__ == "__main__":
   main()

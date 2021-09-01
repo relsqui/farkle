@@ -1,6 +1,6 @@
 import itertools
 
-from .conditional_print import set_print_condition
+from .conditional_print import set_print_condition, if_print
 
 class Stats(object):
   # base cases, we'll fill in the rest below
@@ -9,7 +9,16 @@ class Stats(object):
   ev_dice = {0: 0, 1: 25}
 
   @classmethod
-  def initialize(self, score_dice, watch=()):
+  def initialize(cls, *args, verbose=False, **kwargs):
+    while round(cls.ev_dice[0]) != round(cls.ev_dice.get(6, -1)):
+      cls.ev_dice[0] = cls.ev_dice.get(6, 0)
+      if_print(verbose, f"Recalculating with ev[0]={cls.ev_dice[0]}")
+      cls.calculate_ev(*args, **kwargs)
+    if_print(verbose, "Stabilized.")
+    if_print(verbose)
+
+  @classmethod
+  def calculate_ev(cls, score_dice, watch=()):
     for n in range(2, 7):
       dice_combos = itertools.product([1, 2, 3, 4, 5, 6], repeat=n)
       combo_count = 6 ** n
@@ -28,12 +37,12 @@ class Stats(object):
           # we know we've already generated the stats to do this
           # because we're counting up, and if we didn't farkle,
           # extra_dice must be < n
-          if not self.should_i_bank(score, extra_dice):
-            score += self.ev_dice[extra_dice]
+          if not cls.should_i_bank(score, extra_dice):
+            score += cls.ev_dice[extra_dice]
         total_ev += score
-      self.farkle_chance[n] = zeroes / combo_count
-      self.ev_dice[n] = total_ev / combo_count
+      cls.farkle_chance[n] = zeroes / combo_count
+      cls.ev_dice[n] = total_ev / combo_count
 
   @classmethod
-  def should_i_bank(self, points, dice):
+  def should_i_bank(cls, points, dice):
     return points > ((1 - Stats.farkle_chance[dice]) * points) + Stats.ev_dice[dice]

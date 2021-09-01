@@ -16,8 +16,6 @@ class ScoreType(object):
   @classmethod
   def should_i_apply(cls, dice_counts):
     total_dice = sum(dice_counts)
-    if total_dice == cls.dice_used:
-      return True
     ev_skip = Stats.ev_dice[total_dice]
     ev_apply = cls.points + Stats.ev_dice[total_dice - cls.dice_used]
     if ev_apply > ev_skip:
