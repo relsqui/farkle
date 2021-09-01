@@ -1,17 +1,6 @@
 from farkle.stats import Stats
 from farkle.scoring import score_dice
 
-def print_thresholds():
-  print("Banking score thresholds:")
-  print("(if you have x dice to reroll, bank at y points)")
-  for n in range(1, 7):
-    print(f"{n}:", round(Stats.ev_dice[n] / Stats.farkle_chance[n]))
-
-def print_evs():
-  print("Expected point values of rolling x dice:")
-  for n in range(1, 7):
-    print(f"{n}:", round(Stats.ev_dice[n]))
-
 def interactive():
   while True:
     print("Enter points pending and number of dice available to reroll:")
@@ -30,9 +19,7 @@ def interactive():
 
 def main():
   Stats.initialize(score_dice)
-  print_thresholds()
-  print()
-  print_evs()
+  Stats.print_table()
 
 if __name__ == "__main__":
   main()

@@ -7,15 +7,21 @@ class Stats(object):
   # dict keys are the number of dice rolled
   farkle_chance = {0: 1, 1: 2/3}
   ev_dice = {0: 0, 1: 25}
+  threshold = {}
 
   @classmethod
   def initialize(cls, *args, verbose=False, **kwargs):
+    # the ev of 0 should actually be the ev of 6, because of hot dice,
+    # but we don't know what that is yet. so start with ev[0] = 0,
+    # then update it repeatedly until it stops changing
     while round(cls.ev_dice[0]) != round(cls.ev_dice.get(6, -1)):
       cls.ev_dice[0] = cls.ev_dice.get(6, 0)
       if_print(verbose, f"Recalculating with ev[0]={cls.ev_dice[0]}")
       cls.calculate_ev(*args, **kwargs)
     if_print(verbose, "Stabilized.")
     if_print(verbose)
+    for n in range(1, 7):
+      cls.threshold[n] = round(Stats.ev_dice[n] / Stats.farkle_chance[n])
 
   @classmethod
   def calculate_ev(cls, score_dice, watch=()):
@@ -46,3 +52,9 @@ class Stats(object):
   @classmethod
   def should_i_bank(cls, points, dice):
     return points > ((1 - Stats.farkle_chance[dice]) * points) + Stats.ev_dice[dice]
+
+  @classmethod
+  def print_table(cls):
+    print("Dice\tBank@\tEV\tFarkle%")
+    for i in range(1, 7):
+      print(f"{i}\t{cls.threshold[i]}\t{round(cls.ev_dice[i])}\t{round(cls.farkle_chance[i]*100)}")
