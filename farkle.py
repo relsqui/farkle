@@ -3,7 +3,7 @@ import itertools
 class Stats(object):
   # base cases, we'll fill in the rest below
   # dict keys are the number of dice rolled
-  farkle_chance = {1: 2/3}
+  farkle_chance = {0: 1, 1: 2/3}
   ev_dice = {0: 0, 1: 25}
 
 class Scores(object):
@@ -68,19 +68,19 @@ def initialize_stats():
       for d in dice:
         counts[d] += 1
       score, extra_dice = score_dice(counts)
-      total_ev += score
       if score == 0:
         zeroes += 1
       else:
-        # we know this ev has been initialized because we're counting up,
-        # and if we scored at all, extra_dice < n
-        total_ev += Stats.ev_dice[extra_dice]
+        # we know we've already generated the stats to do this
+        # because we're counting up, and if we didn't farkle,
+        # extra_dice must be < n
+        if not should_i_bank(score, extra_dice):
+          score += Stats.ev_dice[extra_dice]
+      total_ev += score
     Stats.farkle_chance[n] = zeroes / combo_count
     Stats.ev_dice[n] = total_ev / combo_count
 
-def main():
-  initialize_stats()
-  print_thresholds()
+def interactive():
   while True:
     print("Enter points pending and dice quantity to reroll:")
     try:
@@ -96,6 +96,10 @@ def main():
     except (EOFError, KeyboardInterrupt):
       break
     print()
+
+def main():
+  initialize_stats()
+  print_thresholds()
 
 if __name__ == "__main__":
   main()
