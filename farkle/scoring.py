@@ -16,8 +16,9 @@ class ScoreType(object):
   @classmethod
   def should_i_apply(cls, dice_counts):
     total_dice = sum(dice_counts)
+    remaining_dice = total_dice - cls.dice_used
     ev_skip = Stats.ev_dice[total_dice]
-    ev_apply = cls.points + Stats.ev_dice[total_dice - cls.dice_used]
+    ev_apply = ((1 - Stats.farkle_chance[remaining_dice]) * cls.points) + Stats.ev_dice[remaining_dice]
     if ev_apply > ev_skip:
       return True
     else:

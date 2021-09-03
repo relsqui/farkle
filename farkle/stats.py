@@ -51,7 +51,7 @@ class Stats(object):
 
   @classmethod
   def should_i_bank(cls, points, dice):
-    return points > ((1 - Stats.farkle_chance[dice]) * points) + Stats.ev_dice[dice]
+    return points > ((1 - cls.farkle_chance[dice]) * points) + cls.ev_dice[dice]
 
   @classmethod
   def print_table(cls):
