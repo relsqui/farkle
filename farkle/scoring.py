@@ -1,4 +1,3 @@
-from .stats import Stats
 from .conditional_print import print_condition, set_print_condition, con_print
 
 class ScoreType(object):
@@ -14,19 +13,19 @@ class ScoreType(object):
     raise NotImplementedError
 
   @classmethod
-  def should_i_apply(cls, dice_counts):
+  def should_i_apply(cls, dice_counts, score, stats):
     total_dice = sum(dice_counts)
     remaining_dice = total_dice - cls.dice_used
-    ev_skip = Stats.ev_dice[total_dice]
-    ev_apply = ((1 - Stats.farkle_chance[remaining_dice]) * cls.points) + Stats.ev_dice[remaining_dice]
+    ev_skip = stats.ev_dice(total_dice, score)
+    ev_apply = stats.ev_dice(remaining_dice, score + cls.points)
     if ev_apply > ev_skip:
       return True
     else:
       con_print(f"Choosing not to score {cls.__name__}")
 
   @classmethod
-  def test_and_apply(cls, dice_counts, score):
-    while cls.test(dice_counts) and (score == 0 or cls.should_i_apply(dice_counts)):
+  def test_and_apply(cls, dice_counts, score, stats):
+    while cls.test(dice_counts) and (score == 0 or cls.should_i_apply(dice_counts, score, stats)):
       con_print(f"Scoring {cls.__name__}")
       cls.apply(dice_counts)
       score += cls.points
@@ -210,11 +209,11 @@ score_types = [
   Triple5, Triple4, Triple3, Triple2, Triple1, One, Five
 ]
 
-def score_dice(dice_counts, score):
+def score_dice(dice_counts, score, stats):
   con_print("Scoring dice:", counts_to_dice(dice_counts))
   counts = dice_counts.copy()
   for score_type in score_types:
-    score = score_type.test_and_apply(counts, score)
+    score = score_type.test_and_apply(counts, score, stats)
   return score, sum(counts)
 
 def counts_to_dice(dice_counts):
@@ -222,3 +221,10 @@ def counts_to_dice(dice_counts):
   for i in range(1, 7):
     dice += [i] * dice_counts[i]
   return dice
+
+def dice_to_counts(dice):
+  # extra one for index 0, will be ignored
+  counts = [0, 0, 0, 0, 0, 0, 0]
+  for d in dice:
+    counts[d] += 1
+  return counts
