@@ -7,6 +7,7 @@ from .conditional_print import con_print
 class Stats(object):
   farkle_chance = {0:1, 1:.67, 2:.44, 3:.28, 4:.16, 5:.8, 6:.2}
   ev_cache = [{}, {}, {}, {}, {}, {}, {}]
+  cache_hits = 0
   recursion_counter = 0
   temp_recursion_limit = 0
 
@@ -41,6 +42,7 @@ class Stats(object):
         combo_count += 1
       cls.ev_cache[dice_count][score] = round(turn_score_sum / combo_count)
     else:
+      cls.cache_hits += 1
       con_print(f"using cached value for {dice_count} dice and {score} points")
     return cls.ev_cache[dice_count][score]
 
