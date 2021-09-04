@@ -1,4 +1,4 @@
-from .conditional_print import print_condition, set_print_condition, con_print
+from .conditional_print import print_condition, con_print
 
 class ScoreType(object):
   points = None
@@ -13,7 +13,8 @@ class ScoreType(object):
     raise NotImplementedError
 
   @classmethod
-  def should_i_apply(cls, dice_counts, score, stats):
+  def worth_applying(cls, dice_counts, score, stats):
+    return True
     total_dice = sum(dice_counts)
     remaining_dice = total_dice - cls.dice_used
     ev_skip = stats.ev_dice(total_dice, score)
@@ -24,12 +25,13 @@ class ScoreType(object):
       con_print(f"Choosing not to score {cls.__name__}")
 
   @classmethod
-  def test_and_apply(cls, dice_counts, score, stats):
-    while cls.test(dice_counts) and (score == 0 or cls.should_i_apply(dice_counts, score, stats)):
-      con_print(f"Scoring {cls.__name__}")
+  def test_and_apply(cls, dice_counts, turn_score, score, stats):
+    part_score = 0
+    while cls.test(dice_counts) and (turn_score == 0 or cls.worth_applying(dice_counts, score + turn_score + part_score, stats)):
       cls.apply(dice_counts)
-      score += cls.points
-    return score
+      part_score += cls.points
+      con_print(f"Scoring {cls.__name__}, part score is {part_score}")
+    return part_score
 
 
 class SixOfAKind(ScoreType):
@@ -211,9 +213,15 @@ score_types = [
 
 def score_dice(dice_counts, score, stats):
   con_print("Scoring dice:", counts_to_dice(dice_counts))
+  turn_score = 0
   counts = dice_counts.copy()
   for score_type in score_types:
-    score = score_type.test_and_apply(counts, score, stats)
+    turn_score += score_type.test_and_apply(counts, turn_score, score + turn_score, stats)
+  con_print(f"got {turn_score} with {sum(counts)} dice left over")
+  if turn_score == 0:
+    score = 0
+  else:
+    score += turn_score
   return score, sum(counts)
 
 def counts_to_dice(dice_counts):
