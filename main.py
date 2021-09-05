@@ -29,4 +29,5 @@ def print_ev_tables(full_table=False, f=sys.stdout):
   print(f"final cache size was {cache_size} items, we hit it {Stats.cache_hits} times", file=f)
 
 if __name__ == "__main__":
-  print_ev_tables()
+  with open("evtable.txt", "w") as f:
+    print_ev_tables(full_table=True, f=f)

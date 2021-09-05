@@ -14,7 +14,6 @@ class ScoreType(object):
 
   @classmethod
   def worth_applying(cls, dice_counts, score, stats):
-    return True
     total_dice = sum(dice_counts)
     remaining_dice = total_dice - cls.dice_used
     ev_skip = stats.ev_dice(total_dice, score)
