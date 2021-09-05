@@ -95,8 +95,11 @@ class Stats(object):
         else:
           con_print(f"checking ev of leftover {extra_dice} dice")
           ev_continue = cls.ev_dice(extra_dice, score + turn_score)
-          if ev_continue > turn_score:
+          if ev_continue > 0:
+            con_print(f"worth rolling, adding {ev_continue} to turn score")
             turn_score += ev_continue
+          else:
+            con_print("not worth rolling")
         turn_score_sum += turn_score
         combo_count += 1
       cls.ev_cache[dice_count][rscore] = round(turn_score_sum / combo_count)

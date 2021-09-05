@@ -44,8 +44,15 @@ def print_thresholds():
   print("Lowest score you should bank with, by number of dice available to roll:")
   print(threshold)
 
-def main():
+def regenerate_latest():
+  Stats.initialize(verbose=True)
+  Stats.dump_file("latest.stats")
+
+def load_latest():
   Stats.load_file("latest.stats")
+
+def main():
+  load_latest()
   print_thresholds()
 
 if __name__ == "__main__":
