@@ -1,48 +1,42 @@
 import sys
+import time
 
 from farkle.conditional_print import set_print_condition, tare_depth, if_print
 from farkle.stats import Stats
 from farkle.scoring import score_dice
 
 
-def print_ev_tables(full_table=False, f=sys.stdout):
-  print_progress = f is not sys.stdout or not full_table
-  if_print(full_table, "EV of rolling D dice with P points", file=f)
-  if_print(full_table, "P \\ D\t1\t2\t3\t4\t5\t6", file=f)
-  threshold = [0] * 7
-  for points in range(0, 10050, 50):
-    if_print(print_progress, "Testing", points, "... ", end="", file=sys.stderr)
-    if_print(full_table, points, end="", file=f)
-    for dice in range(1, 7):
-      if_print(print_progress, dice, end=" ", file=sys.stderr)
-      Stats.recursion_counter = 0
-      ev = Stats.ev_dice(dice, points)
-      if_print(full_table, f"\t{str(ev)}", end="", file=f)
-      if ev > 0:
-        threshold[dice] = points
-    if_print(full_table, file=f, flush=True)
-    if_print(print_progress, file=sys.stderr)
-  if_print(full_table, file=f)
-  print("Highest score at which it's still worth rolling D dice:", file=f)
-  for dice in range(1, 7):
-    print(f"{dice}: {threshold[dice]}", file=f)
-  print_cache_stats(f=f)
-
-def print_cache_stats(f=sys.stdout):
+def print_cache_stats(file=sys.stdout):
   cache_size = sum(len(Stats.ev_cache[i]) for i in range(7))
-  print(f"Cache size: {cache_size} items. {Stats.cache_hits} hits, {Stats.cache_misses} misses.", file=f)
+  cache_rate = round(Stats.cache_hits * 100 / (Stats.cache_hits + Stats.cache_misses), 2)
+  print(f"Cache size: {cache_size} items. {cache_rate}% hit rate.\n"
+        f"({Stats.cache_hits} hits, {Stats.cache_misses} misses.)", file=file)
+
+def calculate_zero_ev(start_file, generation=0, log_handle=sys.stderr):
+  try:
+    Stats.load_file(start_file)
+    print(f"Loaded stats from {start_file}.", file=log_handle)
+  except FileNotFoundError:
+    print(f"Couldn't find file {start_file}.", file=log_handle)
+  updated_zeroes = Stats.initialize_bases()
+  while updated_zeroes > 0:
+    print(f"Generation {generation} ({updated_zeroes} zeroes updated):", file=log_handle)
+    filename = f"ev_zero_{generation}.txt"
+    # empty the cache to recalculate from new base values
+    for dice in range(2, 7):
+      Stats.ev_cache[dice] = {}
+    print(f"Initializing (started {time.asctime()}) ...")
+    Stats.initialize(verbose=False)
+    Stats.dump_file(filename)
+    print(f"Dumped to {filename}.")
+    print_cache_stats()
+    generation += 1
+    updated_zeroes = Stats.initialize_bases()
+  print(f"Stabilized in {generation} generations!", file=log_handle)
 
 def main():
-  set_print_condition(False)
-  tare_depth(2)
-  # Stats.temp_recursion_limit = 1000000
-  Stats.initialize()
-  try:
-    with open("evtable.txt", "w") as f:
-     print_ev_tables(full_table=True, f=f)
-  except RecursionError:
-    print("hit recursion limit.")
-    print_cache_stats()
+  # calculate_zero_ev("latest.stats")
+  Stats.load_file("latest.stats")
 
 if __name__ == "__main__":
   main()

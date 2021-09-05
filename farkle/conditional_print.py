@@ -1,4 +1,5 @@
 import inspect
+import time
 
 depth_tare = 0
 print_condition = False
@@ -15,11 +16,16 @@ def set_print_condition(value):
   global print_condition
   print_condition = value
 
-def con_print(*args, override=False, **kwargs):
+def maybe_timestamp(return_timestamp):
+  if return_timestamp:
+    return time.asctime()
+  return ""
+
+def con_print(*args, override=False, timestamp=True, **kwargs):
   if print_condition or override:
     indent = stack_depth() - depth_tare
-    print(spacer * indent, *args, **kwargs)
+    print(spacer * indent, maybe_timestamp(timestamp), *args, **kwargs)
 
-def if_print(local_condition, *args, **kwargs):
+def if_print(local_condition, *args, timestamp=True, **kwargs):
   if local_condition:
-    print(*args, **kwargs)
+    print(maybe_timestamp(timestamp), *args, **kwargs)
