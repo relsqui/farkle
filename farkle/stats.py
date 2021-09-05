@@ -19,7 +19,7 @@ class Stats(object):
 
   @classmethod
   def initialize(cls, verbose=False):
-    if len(cls.ev_cache[0]) < 7 or len(cls.ev_cache[1] < 7):
+    if len(cls.ev_cache[0]) < 7 or len(cls.ev_cache[1]) < 7:
       if_print(verbose, "Initializing base cases.", file=sys.stderr)
       cls.initialize_bases()
     if_print(verbose, "Starting cache build, this will take a while.", file=sys.stderr)
@@ -36,10 +36,10 @@ class Stats(object):
     updated = 0
     for points in range(0, 10050, 50):
       ev_zero = cls.ev_cache[6].get(points, 0)
-      if ev_zero != cls.ev_cache[0].get(points, -1):
+      if cls.ev_cache[0].get(points) is None or cls.ev_cache[0][points] != ev_zero:
         updated += 1
       cls.ev_cache[0][points] = ev_zero
-      cls.ev_cache[1][points] = 25 + round((ev_zero - points) * 2/3)
+      cls.ev_cache[1][points] = round(ev_zero/3) + round((-points) * 2/3)
     return updated
 
   @classmethod
@@ -65,8 +65,7 @@ class Stats(object):
         if_print(verbose, points, evs, file=sys.stderr)
         for i in range(1, 7):
           cls.ev_cache[i][points] = evs[i-1]
-    for points in range(0, 10050, 50):
-      cls.ev_cache[0][points] = 0
+        cls.ev_cache[0][points] = cls.ev_cache[6][points]
 
   @classmethod
   def ev_dice(cls, dice_count, score):
