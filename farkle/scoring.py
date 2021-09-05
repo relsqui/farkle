@@ -218,11 +218,7 @@ def score_dice(dice_counts, score, stats):
   for score_type in score_types:
     turn_score += score_type.test_and_apply(counts, turn_score, score + turn_score, stats)
   con_print(f"got {turn_score} with {sum(counts)} dice left over")
-  if turn_score == 0:
-    score = 0
-  else:
-    score += turn_score
-  return score, sum(counts)
+  return turn_score, sum(counts)
 
 def counts_to_dice(dice_counts):
   dice = []
