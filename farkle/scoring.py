@@ -213,20 +213,14 @@ score_types = [
 # make sure the first one is the most valuable (in points per dice)
 score_types.sort(key=lambda s: s.points/s.dice_used, reverse=True)
 
-def score_dice(dice_counts, score, stats):
-  con_print("Scoring dice:", counts_to_dice(dice_counts))
+def score_dice(dice_combo, score, stats):
+  con_print("Scoring dice:", dice_combo)
+  counts = dice_to_counts(dice_combo)
   turn_score = 0
-  counts = dice_counts.copy()
   for score_type in score_types:
     turn_score += score_type.test_and_apply(counts, turn_score, score + turn_score, stats)
   con_print(f"got {turn_score} with {sum(counts)} dice left over")
   return turn_score, sum(counts)
-
-def counts_to_dice(dice_counts):
-  dice = []
-  for i in range(1, 7):
-    dice += [i] * dice_counts[i]
-  return dice
 
 def dice_to_counts(dice):
   # extra one for index 0, will be ignored

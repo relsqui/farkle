@@ -88,7 +88,7 @@ class Stats(object):
       con_print(f"calculating ev for rolling {dice_count} dice with {score} points")
       for combo in itertools.product([1, 2, 3, 4, 5, 6], repeat=dice_count):
         con_print(f"checking combo {list(combo)}")
-        turn_score, extra_dice = score_dice(dice_to_counts(combo), score, cls)
+        turn_score, extra_dice = score_dice(combo, score, cls)
         if turn_score == 0:
           con_print("farkle")
           turn_score = -score
