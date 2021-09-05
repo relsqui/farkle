@@ -1,4 +1,4 @@
-from .conditional_print import print_condition, con_print
+from .conditional_print import con_print
 
 class ScoreType(object):
   points = None

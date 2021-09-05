@@ -1,7 +1,6 @@
 import sys
 import time
 
-from farkle.conditional_print import set_print_condition, tare_depth, if_print
 from farkle.stats import Stats
 from farkle.scoring import score_dice
 

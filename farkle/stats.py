@@ -10,7 +10,6 @@ def round50(i):
   return round(i/50) * 50
 
 class Stats(object):
-  farkle_chance = {0:1, 1:.67, 2:.44, 3:.28, 4:.16, 5:.8, 6:.2}
   ev_cache = [{}, {}, {}, {}, {}, {}, {}]
   cache_hits = 0
   cache_misses = 0
