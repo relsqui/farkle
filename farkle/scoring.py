@@ -207,8 +207,11 @@ class Five(ScoreType):
 
 score_types = [
   SixOfAKind, Straight, FiveOfAKind, ThreePair, FourOfAKind, Triple1, Triple6,
-  Triple5, Triple4, Triple3, Triple2, Triple1, One, Five
+  Triple5, Triple4, Triple3, Triple2, One, Five
 ]
+# since we always apply the first score type we find (if any),
+# make sure the first one is the most valuable (in points per dice)
+score_types.sort(key=lambda s: s.points/s.dice_used, reverse=True)
 
 def score_dice(dice_counts, score, stats):
   con_print("Scoring dice:", counts_to_dice(dice_counts))
@@ -227,7 +230,7 @@ def counts_to_dice(dice_counts):
 
 def dice_to_counts(dice):
   # extra one for index 0, will be ignored
-  counts = [0, 0, 0, 0, 0, 0, 0]
+  counts = [0] * 7
   for d in dice:
     counts[d] += 1
   return counts
